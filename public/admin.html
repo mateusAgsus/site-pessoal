@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel — Editar Site</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💍</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Cinzel:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="side-logo">💍 Painel do Site</div>
+    <nav class="side-nav" id="sideNav">
+      <button data-tab="geral" class="active">⚙️ Geral &amp; Tema</button>
+      <button data-tab="secoes">🧩 Seções do Site</button>
+      <button data-tab="presentes">🎁 Presentes</button>
+      <button data-tab="confirmacoes">✅ Confirmações</button>
+      <button data-tab="recados">💬 Recados</button>
+    </nav>
+    <a class="side-view" href="/" target="_blank">👁️ Ver o site</a>
+  </aside>
+
+  <button class="mobile-menu-btn" id="mobileMenuBtn">☰ Menu</button>
+
+  <main class="content" id="content">
+    <div class="loading">Carregando...</div>
+  </main>
+
+  <div class="savebar" id="savebar">
+    <span class="savebar-status" id="saveStatus">Alterações não salvas</span>
+    <button class="btn primary" id="saveBtn">💾 Salvar alterações</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

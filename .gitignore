@@ -1,0 +1,8 @@
+# dependências
+node_modules/
+
+# dados do casal (conteúdo editado, confirmações, recados)
+data/
+
+# imagens enviadas pelo painel e baixadas de links
+public/uploads/

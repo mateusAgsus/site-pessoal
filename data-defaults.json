@@ -1,0 +1,101 @@
+{
+  "theme": {
+    "accent": "#CF9674",
+    "accentDark": "#B58365",
+    "ink": "#404951",
+    "soft": "#FFF1E3",
+    "fontDisplay": "Cinzel",
+    "fontBody": "Quicksand"
+  },
+  "couple": {
+    "name1": "Andressa",
+    "name2": "Mateus"
+  },
+  "wedding": {
+    "date": "2026-11-30T18:00"
+  },
+  "sectionOrder": ["home", "casal", "padrinhos", "cerimonia", "presentes", "rsvp", "recados"],
+  "hero": {
+    "visible": true,
+    "tagline": "Save the date",
+    "backgroundImage": "",
+    "showCountdown": true
+  },
+  "sections": {
+    "home": {
+      "visible": true,
+      "title": "Bem-vindos ao nosso site!",
+      "text": "Criamos este espaço com muito carinho para compartilhar com vocês cada detalhe deste momento tão especial das nossas vidas. Aqui vocês encontram informações sobre a cerimônia, a recepção, nossa lista de presentes e muito mais.\n\nNão esqueçam de confirmar a presença — mal podemos esperar para celebrar com vocês!"
+    },
+    "casal": {
+      "visible": true,
+      "title": "O Casal",
+      "photos": ["/img/casal-1.jpg", "/img/casal-2.jpg"],
+      "story": "Foi em um café, em uma tarde ensolarada, que nossos olhares se encontraram pela primeira vez. Um sorriso tímido marcou o início de uma conexão especial. Compartilhamos risos, sonhos e momentos inesquecíveis.\n\nSuperamos desafios, viajamos por lugares exóticos e criamos memórias preciosas.\n\nAgora, decidimos unir nossas vidas em matrimônio, celebrando o amor que nos une. Cada detalhe do nosso casamento é cuidadosamente planejado para refletir nossa história. Embarcaremos juntos nessa nova aventura, prontos para enfrentar o futuro com coragem, devoção e um amor que durará para sempre."
+    },
+    "padrinhos": {
+      "visible": true,
+      "title": "Padrinhos",
+      "items": [
+        { "name": "Ana Clara", "role": "Madrinha", "photo": "/img/padrinho-1.jpg" },
+        { "name": "Daiana", "role": "Madrinha", "photo": "/img/padrinho-2.jpg" },
+        { "name": "Bianca", "role": "Madrinha", "photo": "/img/padrinho-3.jpg" },
+        { "name": "Rafael", "role": "Padrinho", "photo": "/img/padrinho-4.jpg" },
+        { "name": "Breno", "role": "Padrinho", "photo": "/img/padrinho-5.jpg" },
+        { "name": "Kauê", "role": "Padrinho", "photo": "/img/padrinho-6.jpg" }
+      ]
+    },
+    "cerimonia": {
+      "visible": true,
+      "title": "Cerimônia e Recepção",
+      "image": "/img/cerimonia.png",
+      "text": "Será uma alegria enorme ter você com a gente neste dia. Confira abaixo os detalhes de onde e quando tudo vai acontecer.",
+      "events": [
+        {
+          "name": "Cerimônia",
+          "time": "18h00",
+          "venue": "Igreja Nossa Senhora das Graças",
+          "address": "Rua das Flores, 123 — Centro",
+          "mapsUrl": ""
+        },
+        {
+          "name": "Recepção",
+          "time": "20h00",
+          "venue": "Espaço Jardim das Oliveiras",
+          "address": "Av. Principal, 456 — Jardim Europa",
+          "mapsUrl": ""
+        }
+      ]
+    },
+    "presentes": {
+      "visible": true,
+      "title": "Lista de Presentes",
+      "subtitle": "Sua presença é o nosso maior presente! Mas se quiser nos mimar, escolha um presente abaixo — você será redirecionado para a loja.",
+      "items": [
+        { "id": "g1", "name": "Batedeira Planetária", "url": "", "image": "/img/presente-batedeira_planetaria.jpg", "price": 499.9, "visible": true },
+        { "id": "g2", "name": "Aparelho de Jantar Branco", "url": "", "image": "/img/presente-aparelho_de_jantar_branco.jpg", "price": 289.9, "visible": true },
+        { "id": "g3", "name": "2 Passagens Aéreas — Lua de Mel", "url": "", "image": "/img/presente-2_passagens_aereas_lua_de_mel.jpg", "price": 2500, "visible": true },
+        { "id": "g4", "name": "Adega de Vinhos Climatizada", "url": "", "image": "/img/presente-adega_vinhos_climatizada.jpg", "price": 899.9, "visible": true },
+        { "id": "g5", "name": "Churrasqueira Elétrica", "url": "", "image": "/img/presente-churrasqueira_eletrica.jpg", "price": 349.9, "visible": true },
+        { "id": "g6", "name": "Aparelho de Fondue Preto", "url": "", "image": "/img/presente-aparelho_fondue_preto.jpg", "price": 199.9, "visible": true },
+        { "id": "g7", "name": "Aspirador de Pó Vertical", "url": "", "image": "/img/presente-aspirador_po_vertical.jpg", "price": 459.9, "visible": true },
+        { "id": "g8", "name": "Ar-condicionado Split", "url": "", "image": "/img/presente-ar_condicionado_split.jpg", "price": 1899.9, "visible": true },
+        { "id": "g9", "name": "Aparador de Madeira Jequitibá", "url": "", "image": "/img/presente-aparador_madeira_jequitiba.jpg", "price": 749.9, "visible": true },
+        { "id": "g10", "name": "Centrífuga de Suco", "url": "", "image": "/img/presente-centrifuga_de_suco.jpg", "price": 229.9, "visible": true }
+      ]
+    },
+    "rsvp": {
+      "visible": true,
+      "title": "Confirme sua presença",
+      "text": "Por favor, confirme sua presença até 15 dias antes do casamento. É rapidinho!"
+    },
+    "recados": {
+      "visible": true,
+      "title": "Recados",
+      "text": "Deixe uma mensagem carinhosa para os noivos!"
+    }
+  },
+  "footer": {
+    "text": "Feito com amor"
+  }
+}
