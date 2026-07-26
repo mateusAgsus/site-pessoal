@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { wrap } = require('../middleware');
 
 function isPlainObject(v) {
   return Object.prototype.toString.call(v) === '[object Object]';
@@ -24,20 +25,29 @@ module.exports = function siteRoutes({ store, guard, readDefaults }) {
   router.get('/defaults', guard, (req, res) => res.json(readDefaults()));
 
   router.get('/', (req, res, next) => {
+    const send = (full) =>
+      store
+        .read()
+        .then((cfg) => res.json(full ? cfg : maskAnonymousReservations(cfg)))
+        .catch(next);
     // ?full=1 (painel) entrega os nomes reais — protegido quando há senha
     if (req.query.full === '1') {
-      return guard(req, res, () => res.json(store.read()));
+      return guard(req, res, () => send(true));
     }
-    res.json(maskAnonymousReservations(store.read()));
+    send(false);
   });
 
-  router.put('/', guard, (req, res) => {
-    if (!isPlainObject(req.body)) {
-      return res.status(400).json({ error: 'Dados inválidos.' });
-    }
-    store.write(req.body);
-    res.json({ ok: true });
-  });
+  router.put(
+    '/',
+    guard,
+    wrap(async (req, res) => {
+      if (!isPlainObject(req.body)) {
+        return res.status(400).json({ error: 'Dados inválidos.' });
+      }
+      await store.write(req.body);
+      res.json({ ok: true });
+    })
+  );
 
   return router;
 };

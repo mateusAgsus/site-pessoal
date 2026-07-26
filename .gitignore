@@ -6,3 +6,7 @@ data/
 
 # imagens enviadas pelo painel e baixadas de links
 public/uploads/
+
+# deploy e segredos locais
+.vercel/
+.env

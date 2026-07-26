@@ -2,7 +2,7 @@ const { Router } = require('express');
 const { fetchLinkPreview } = require('../scraper');
 const { BlockedUrlError } = require('../net-guard');
 
-module.exports = function previewRoutes({ uploadsDir, guard }) {
+module.exports = function previewRoutes({ uploads, guard }) {
   const router = Router();
 
   router.get('/', guard, async (req, res) => {
@@ -11,7 +11,7 @@ module.exports = function previewRoutes({ uploadsDir, guard }) {
       return res.status(400).json({ error: 'Informe uma URL válida (começando com http/https).' });
     }
     try {
-      res.json(await fetchLinkPreview(url, uploadsDir));
+      res.json(await fetchLinkPreview(url, uploads));
     } catch (err) {
       if (err instanceof BlockedUrlError) {
         return res.status(400).json({ error: err.message });

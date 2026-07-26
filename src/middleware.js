@@ -49,4 +49,12 @@ function rateLimit({ windowMs = 60_000, max = 10 } = {}) {
   };
 }
 
-module.exports = { basicAuth, rateLimit };
+/**
+ * Encaminha rejeições de handlers async para o error handler do
+ * Express 4, que não faz isso sozinho.
+ */
+function wrap(fn) {
+  return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+}
+
+module.exports = { basicAuth, rateLimit, wrap };

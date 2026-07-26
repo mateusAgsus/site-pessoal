@@ -6,6 +6,13 @@ const path = require('node:path');
 
 const createApp = require('../src/app');
 
+// conteúdo de fábrica real — os testes não dependem de nomes específicos
+const FACTORY = JSON.parse(
+  fs
+    .readFileSync(path.join(__dirname, '..', 'data-defaults.json'), 'utf8')
+    .replace(/^﻿/, '')
+);
+
 // PNG válido de 1x1 pixel para o teste de upload
 const TINY_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
@@ -47,7 +54,7 @@ test('GET /api/site devolve a configuração padrão', async () => {
   const resp = await api('/api/site');
   assert.equal(resp.status, 200);
   const cfg = await resp.json();
-  assert.equal(cfg.couple.name1, 'Ana');
+  assert.equal(cfg.couple.name1, FACTORY.couple.name1);
   assert.ok(Array.isArray(cfg.sectionOrder));
   assert.ok(cfg.sections.presentes.items.length > 0);
 });
@@ -73,7 +80,7 @@ test('GET /api/site/defaults devolve a configuração de fábrica', async () => 
   const resp = await api('/api/site/defaults');
   assert.equal(resp.status, 200);
   const defaults = await resp.json();
-  assert.equal(defaults.couple.name1, 'Ana');
+  assert.equal(defaults.couple.name1, FACTORY.couple.name1);
   assert.ok(defaults.theme.accent);
   // não é afetado por alterações salvas no site
   const current = await (await api('/api/site')).json();

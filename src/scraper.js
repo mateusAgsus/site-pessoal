@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 const { safeFetch } = require('./net-guard');
 
@@ -122,7 +120,7 @@ const IMAGE_EXT = {
   'image/jpeg': '.jpg',
 };
 
-async function downloadImage(imageUrl, referer, destDir) {
+async function downloadImage(imageUrl, referer, uploads) {
   const resp = await safeFetch(imageUrl, {
     headers: { ...FETCH_HEADERS, Accept: 'image/*', Referer: referer },
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -134,16 +132,15 @@ async function downloadImage(imageUrl, referer, destDir) {
   const buf = Buffer.from(await resp.arrayBuffer());
   if (buf.length > MAX_IMAGE_BYTES) throw new Error('Imagem grande demais');
   const name = crypto.randomBytes(8).toString('hex') + ext;
-  fs.writeFileSync(path.join(destDir, name), buf);
-  return '/uploads/' + name;
+  return uploads.save(name, buf, type);
 }
 
 /**
  * Busca a página do presente e retorna {title, image, price}.
- * A imagem é baixada para `uploadsDir` quando possível (URL local);
+ * A imagem é copiada para o armazenamento de uploads quando possível;
  * senão mantém a URL remota como fallback.
  */
-async function fetchLinkPreview(url, uploadsDir) {
+async function fetchLinkPreview(url, uploads) {
   const resp = await safeFetch(url, {
     headers: FETCH_HEADERS,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -156,7 +153,7 @@ async function fetchLinkPreview(url, uploadsDir) {
   if (data.image) {
     try {
       const absolute = new URL(data.image, resp.url || url).href;
-      data.image = await downloadImage(absolute, url, uploadsDir);
+      data.image = await downloadImage(absolute, url, uploads);
     } catch {
       /* mantém a URL remota */
     }
