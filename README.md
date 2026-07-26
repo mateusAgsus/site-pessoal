@@ -76,7 +76,7 @@ O armazenamento tem **dois modos**, escolhidos automaticamente:
 ## Deploy no Vercel (grátis, com Supabase)
 
 ### 1. Criar o projeto no Supabase
-CháPanela@2022
+
 Crie uma conta em [supabase.com](https://supabase.com), crie um projeto e, no **SQL Editor**, rode:
 
 ```sql
