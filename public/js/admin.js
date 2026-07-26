@@ -88,6 +88,9 @@
         (server.sections?.presentes?.items || []).map((g) => [g.id, g.reserved])
       );
       for (const gift of cfg.sections?.presentes?.items || []) {
+        // presente que o servidor ainda não conhece (ex.: importado da
+        // planilha) mantém a reserva local em vez de perdê-la
+        if (!byId.has(gift.id)) continue;
         const reserved = byId.get(gift.id);
         if (reserved) gift.reserved = reserved;
         else delete gift.reserved;
@@ -620,13 +623,110 @@
     content.innerHTML = `
       <div class="page-title">🎁 Presentes</div>
       <div class="page-sub">Adicione um presente colando o link da loja — nome, foto e preço são preenchidos automaticamente quando possível.</div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:1.2rem">
+      <div style="display:flex;justify-content:flex-end;gap:0.7rem;margin-bottom:1.2rem">
+        <button class="btn" id="importGifts">📥 Importar planilha</button>
         <button class="btn primary" id="addGift">➕ Adicionar presente</button>
       </div>
       <div id="giftList"></div>`;
 
     document.getElementById('addGift').onclick = () => openGiftModal(null);
+    document.getElementById('importGifts').onclick = openImportModal;
     rebuildGiftList();
+  }
+
+  /* lê linhas coladas de uma planilha (Excel/Google Sheets, separadas por
+     tab ou ponto e vírgula): [marcação X,] nome do presente [, quem vai dar] */
+  function parseGiftSheet(text) {
+    const rows = [];
+    for (const raw of String(text).split(/\r?\n/)) {
+      if (!raw.trim()) continue;
+      let cells = (raw.includes('\t') ? raw.split('\t') : raw.split(';')).map((c) => c.trim());
+      // planilhas como a do chá de panela têm uma coluna de marcação antes do item
+      if (cells.length >= 3 && (cells[0] === '' || /^x$/i.test(cells[0]))) cells = cells.slice(1);
+      const name = (cells[0] || '').slice(0, 140);
+      if (!name || /^item$/i.test(name)) continue; // linha vazia ou cabeçalho
+      rows.push({ name, giver: (cells[1] || '').slice(0, 120) });
+    }
+    return rows;
+  }
+
+  function openImportModal() {
+    const back = document.createElement('div');
+    back.className = 'modal-back';
+    back.innerHTML = `
+      <div class="modal">
+        <h3>📥 Importar planilha de presentes</h3>
+        <p class="hint" style="margin-bottom:0.8rem">
+          Copie as linhas da sua planilha (Excel ou Google Sheets) e cole abaixo.
+          A coluna com texto é o nome do presente; a coluna seguinte, se preenchida,
+          é o nome de quem vai dar — o presente já entra marcado como reservado.
+        </p>
+        <div class="field">
+          <textarea id="impText" placeholder="Cafeteira Elétrica Britânia&#9;Felipe Carvalho&#10;Chaleira elétrica&#9;Letícia Araújo&#10;Jogo de toalhas de banho"></textarea>
+        </div>
+        <div class="fetch-status" id="impStatus"></div>
+        <label class="confirm-check"><input type="checkbox" id="impReplace"> Substituir a lista atual (apaga os presentes existentes)</label>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="impCancel">Cancelar</button>
+          <button type="button" class="btn primary" id="impOk" disabled>Importar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(back);
+
+    const $ = (id) => back.querySelector('#' + id);
+    const close = () => back.remove();
+
+    $('impText').oninput = () => {
+      const rows = parseGiftSheet($('impText').value);
+      const withGiver = rows.filter((r) => r.giver).length;
+      const status = $('impStatus');
+      if (rows.length) {
+        status.className = 'fetch-status ok';
+        status.textContent = `✔ ${rows.length} presente(s) reconhecido(s), ${withGiver} com nome de quem vai dar.`;
+      } else {
+        status.className = 'fetch-status';
+        status.textContent = '';
+      }
+      $('impOk').disabled = !rows.length;
+    };
+
+    $('impCancel').onclick = close;
+    back.addEventListener('click', (e) => { if (e.target === back) close(); });
+
+    $('impOk').onclick = () => {
+      const rows = parseGiftSheet($('impText').value);
+      if (!rows.length) return;
+      const items = cfg.sections.presentes.items || (cfg.sections.presentes.items = []);
+      if ($('impReplace').checked) items.length = 0;
+
+      const existing = new Set(items.map((g) => g.name.trim().toLowerCase()));
+      let added = 0, reservedN = 0, skipped = 0;
+      rows.forEach((r, i) => {
+        const key = r.name.toLowerCase();
+        if (existing.has(key)) { skipped++; return; } // já está na lista
+        existing.add(key);
+        const gift = {
+          id: 'g' + Date.now().toString(36) + i.toString(36),
+          name: r.name, url: '', image: '', price: null, visible: true,
+        };
+        if (r.giver) {
+          gift.reserved = { name: r.giver, anonymous: false, date: new Date().toISOString() };
+          reservedN++;
+        }
+        items.push(gift);
+        added++;
+      });
+
+      close();
+      markDirty();
+      rebuildGiftList();
+      toast(
+        `📥 ${added} presente(s) importado(s)` +
+        (reservedN ? `, ${reservedN} já reservado(s)` : '') +
+        (skipped ? ` — ${skipped} repetido(s) ignorado(s)` : '') +
+        '. Lembre de salvar as alterações!'
+      );
+    };
   }
 
   function rebuildGiftList() {
