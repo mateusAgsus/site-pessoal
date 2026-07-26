@@ -39,7 +39,7 @@
 
   const n1 = esc(cfg.couple?.name1 || 'Noiva');
   const n2 = esc(cfg.couple?.name2 || 'Noivo');
-  document.title = `${cfg.couple?.name1 || ''} & ${cfg.couple?.name2 || ''} — Nosso Casamento`;
+  document.title = `${cfg.couple?.name1 || ''} & ${cfg.couple?.name2 || ''} — Chá de Panela`;
 
   const weddingDate = cfg.wedding?.date ? new Date(cfg.wedding.date) : null;
   const dateFmt = weddingDate
