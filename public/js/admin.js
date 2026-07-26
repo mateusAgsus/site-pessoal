@@ -36,6 +36,39 @@
     el._t = setTimeout(() => (el.className = 'toast'), 3500);
   }
 
+  /* substitui o confirm() nativo por um modal no estilo do painel;
+     retorna Promise<boolean> — use com await */
+  function confirmModal({ title, message, okLabel = 'Confirmar', cancelLabel = 'Cancelar', danger = false }) {
+    return new Promise((resolve) => {
+      const back = document.createElement('div');
+      back.className = 'modal-back';
+      back.innerHTML = `
+        <div class="modal confirm-modal" role="alertdialog" aria-modal="true" aria-label="${esc(title)}">
+          <h3>${esc(title)}</h3>
+          <p class="confirm-msg">${esc(message).replace(/\n/g, '<br>')}</p>
+          <div class="modal-actions">
+            <button type="button" class="btn" data-a="cancel">${esc(cancelLabel)}</button>
+            <button type="button" class="btn ${danger ? 'danger' : 'primary'}" data-a="ok">${esc(okLabel)}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(back);
+
+      const done = (answer) => {
+        document.removeEventListener('keydown', onKey);
+        back.remove();
+        resolve(answer);
+      };
+      const onKey = (e) => {
+        if (e.key === 'Escape') done(false);
+      };
+      document.addEventListener('keydown', onKey);
+      back.querySelector('[data-a=ok]').onclick = () => done(true);
+      back.querySelector('[data-a=cancel]').onclick = () => done(false);
+      back.addEventListener('click', (e) => { if (e.target === back) done(false); });
+      back.querySelector('[data-a=cancel]').focus();
+    });
+  }
+
   function markDirty() {
     dirty = true;
     savebar.classList.add('show');
@@ -270,7 +303,12 @@
 
     // ---- redefinir só as cores ----
     document.getElementById('resetColors').onclick = async () => {
-      if (!confirm('Voltar às cores padrão do site? As fontes e o resto do conteúdo não mudam.')) return;
+      const ok = await confirmModal({
+        title: '🎨 Redefinir as cores',
+        message: 'Voltar às cores padrão do site? As fontes e o resto do conteúdo não mudam.',
+        okLabel: 'Redefinir cores',
+      });
+      if (!ok) return;
       try {
         const defaults = await fetch('/api/site/defaults').then((r) => r.json());
         for (const key of ['accent', 'accentDark', 'ink', 'soft']) {
@@ -286,8 +324,22 @@
 
     // ---- redefinir o site inteiro ----
     document.getElementById('resetAll').onclick = async () => {
-      if (!confirm('REDEFINIR TODO O SITE PARA O PADRÃO?\n\nTextos, fotos, presentes, reservas, cores e fontes voltam aos valores de fábrica. Confirmações de presença e recados são mantidos.\n\nEssa ação NÃO pode ser desfeita.')) return;
-      if (!confirm('Tem certeza mesmo? Todo o conteúdo personalizado será perdido.')) return;
+      const first = await confirmModal({
+        title: '⚠️ Redefinir todo o site',
+        message:
+          'Textos, fotos, presentes, reservas, cores e fontes voltam aos valores de fábrica. Confirmações de presença e recados são mantidos.\n\nEssa ação NÃO pode ser desfeita.',
+        okLabel: 'Redefinir tudo',
+        danger: true,
+      });
+      if (!first) return;
+      const second = await confirmModal({
+        title: 'Tem certeza mesmo?',
+        message: 'Todo o conteúdo personalizado será perdido.',
+        okLabel: 'Sim, redefinir',
+        cancelLabel: 'Voltar',
+        danger: true,
+      });
+      if (!second) return;
       try {
         const defaults = await fetch('/api/site/defaults').then((r) => r.json());
         const resp = await fetch('/api/site', {
@@ -595,7 +647,12 @@
       const freeBtn = row.querySelector('[data-a=free]');
       if (freeBtn) {
         freeBtn.onclick = async () => {
-          if (!confirm(`Liberar "${g.name}" para ser escolhido de novo?`)) return;
+          const ok = await confirmModal({
+            title: '↩ Liberar presente',
+            message: `Liberar "${g.name}" para ser escolhido de novo?`,
+            okLabel: 'Liberar',
+          });
+          if (!ok) return;
           const resp = await fetch(`/api/gifts/${encodeURIComponent(g.id)}/reserve`, { method: 'DELETE' });
           if (resp.ok) {
             delete g.reserved;
@@ -612,8 +669,14 @@
         markDirty();
       };
       row.querySelector('[data-a=edit]').onclick = () => openGiftModal(g);
-      row.querySelector('[data-a=del]').onclick = () => {
-        if (!confirm(`Remover o presente "${g.name}"?`)) return;
+      row.querySelector('[data-a=del]').onclick = async () => {
+        const ok = await confirmModal({
+          title: '🗑 Remover presente',
+          message: `Remover o presente "${g.name}"?`,
+          okLabel: 'Remover',
+          danger: true,
+        });
+        if (!ok) return;
         items.splice(i, 1);
         markDirty();
         rebuildGiftList();
@@ -763,7 +826,13 @@
 
     content.querySelectorAll('button[data-id]').forEach((btn) => {
       btn.onclick = async () => {
-        if (!confirm('Excluir esta confirmação?')) return;
+        const ok = await confirmModal({
+          title: 'Excluir confirmação',
+          message: 'Excluir esta confirmação de presença?',
+          okLabel: 'Excluir',
+          danger: true,
+        });
+        if (!ok) return;
         await fetch('/api/rsvp/' + btn.dataset.id, { method: 'DELETE' });
         renderRsvps();
       };
@@ -797,7 +866,13 @@
 
     content.querySelectorAll('button[data-id]').forEach((btn) => {
       btn.onclick = async () => {
-        if (!confirm('Excluir este recado?')) return;
+        const ok = await confirmModal({
+          title: 'Excluir recado',
+          message: 'Excluir este recado?',
+          okLabel: 'Excluir',
+          danger: true,
+        });
+        if (!ok) return;
         await fetch('/api/messages/' + btn.dataset.id, { method: 'DELETE' });
         renderRecados();
       };
