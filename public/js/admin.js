@@ -37,8 +37,9 @@
   }
 
   /* substitui o confirm() nativo por um modal no estilo do painel;
-     retorna Promise<boolean> — use com await */
-  function confirmModal({ title, message, okLabel = 'Confirmar', cancelLabel = 'Cancelar', danger = false }) {
+     retorna Promise — use com await. Sem checkboxLabel resolve boolean;
+     com checkboxLabel resolve false ou { ok: true, checked } */
+  function confirmModal({ title, message, okLabel = 'Confirmar', cancelLabel = 'Cancelar', danger = false, checkboxLabel = '' }) {
     return new Promise((resolve) => {
       const back = document.createElement('div');
       back.className = 'modal-back';
@@ -46,6 +47,7 @@
         <div class="modal confirm-modal" role="alertdialog" aria-modal="true" aria-label="${esc(title)}">
           <h3>${esc(title)}</h3>
           <p class="confirm-msg">${esc(message).replace(/\n/g, '<br>')}</p>
+          ${checkboxLabel ? `<label class="confirm-check"><input type="checkbox"> ${esc(checkboxLabel)}</label>` : ''}
           <div class="modal-actions">
             <button type="button" class="btn" data-a="cancel">${esc(cancelLabel)}</button>
             <button type="button" class="btn ${danger ? 'danger' : 'primary'}" data-a="ok">${esc(okLabel)}</button>
@@ -54,9 +56,11 @@
       document.body.appendChild(back);
 
       const done = (answer) => {
+        const checked = Boolean(checkboxLabel && back.querySelector('.confirm-check input').checked);
         document.removeEventListener('keydown', onKey);
         back.remove();
-        resolve(answer);
+        if (!answer) return resolve(false);
+        resolve(checkboxLabel ? { ok: true, checked } : true);
       };
       const onKey = (e) => {
         if (e.key === 'Escape') done(false);
@@ -327,14 +331,18 @@
       const first = await confirmModal({
         title: '⚠️ Redefinir todo o site',
         message:
-          'Textos, fotos, presentes, reservas, cores e fontes voltam aos valores de fábrica. Confirmações de presença e recados são mantidos.\n\nEssa ação NÃO pode ser desfeita.',
+          'Textos, fotos, presentes, reservas, cores e fontes voltam aos valores de fábrica.\n\nEssa ação NÃO pode ser desfeita.',
         okLabel: 'Redefinir tudo',
         danger: true,
+        checkboxLabel: 'Apagar também as confirmações de presença e os recados',
       });
       if (!first) return;
+      const wipeGuests = first.checked;
       const second = await confirmModal({
         title: 'Tem certeza mesmo?',
-        message: 'Todo o conteúdo personalizado será perdido.',
+        message: wipeGuests
+          ? 'Todo o conteúdo personalizado, as confirmações de presença e os recados serão perdidos.'
+          : 'Todo o conteúdo personalizado será perdido. Confirmações de presença e recados serão mantidos.',
         okLabel: 'Sim, redefinir',
         cancelLabel: 'Voltar',
         danger: true,
@@ -348,11 +356,18 @@
           body: JSON.stringify(defaults),
         });
         if (!resp.ok) throw new Error();
+        if (wipeGuests) {
+          const [r1, r2] = await Promise.all([
+            fetch('/api/rsvp', { method: 'DELETE' }),
+            fetch('/api/messages', { method: 'DELETE' }),
+          ]);
+          if (!r1.ok || !r2.ok) throw new Error();
+        }
         cfg = defaults;
         dirty = false;
         savebar.classList.remove('show');
         renderGeral();
-        toast('✅ Site redefinido para o padrão!');
+        toast(wipeGuests ? '✅ Site redefinido! Confirmações e recados apagados.' : '✅ Site redefinido para o padrão!');
       } catch {
         toast('Erro ao redefinir o site. Tente novamente.', true);
       }

@@ -34,5 +34,15 @@ module.exports = function messagesRoutes({ store, guard, limiter }) {
     })
   );
 
+  // admin apaga todos os recados (opção do reset completo do painel)
+  router.delete(
+    '/',
+    guard,
+    wrap(async (req, res) => {
+      await store.clear();
+      res.json({ ok: true });
+    })
+  );
+
   return router;
 };

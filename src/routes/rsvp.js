@@ -37,5 +37,15 @@ module.exports = function rsvpRoutes({ store, guard, limiter }) {
     })
   );
 
+  // admin apaga todas as confirmações (opção do reset completo do painel)
+  router.delete(
+    '/',
+    guard,
+    wrap(async (req, res) => {
+      await store.clear();
+      res.json({ ok: true });
+    })
+  );
+
   return router;
 };

@@ -344,6 +344,11 @@ details.card .detail-body { padding: 0 1.5rem 1.5rem; border-top: 1px solid var(
 .confirm-modal { max-width: 420px; }
 .confirm-modal h3 { margin-bottom: 0.7rem; }
 .confirm-modal .confirm-msg { font-size: 0.95rem; line-height: 1.55; }
+.confirm-modal .confirm-check {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  margin-top: 1rem; font-size: 0.9rem; cursor: pointer;
+}
+.confirm-modal .confirm-check input { margin-top: 0.2rem; accent-color: var(--danger); }
 .fetch-row { display: flex; gap: 0.6rem; }
 .fetch-row input { flex: 1; }
 .fetch-status { font-size: 0.82rem; margin-top: 0.4rem; }

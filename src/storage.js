@@ -52,6 +52,7 @@ function createListStore(file) {
       const list = await doc.read();
       await doc.write(list.filter((item) => item.id !== id));
     },
+    clear: () => doc.write([]),
   };
 }
 

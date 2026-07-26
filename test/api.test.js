@@ -145,6 +145,40 @@ test('fluxo recados: valida, cria, lista e exclui', async () => {
   assert.equal((await (await api('/api/messages')).json()).length, 0);
 });
 
+// ---------- reset: apagar todas as confirmações e recados ----------
+test('DELETE /api/rsvp e /api/messages apagam tudo (reset do painel)', async () => {
+  // app próprio: o rate limit dos formulários é compartilhado por IP
+  const resetTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'wedding-reset-'));
+  const app = createApp({
+    dataDir: path.join(resetTmp, 'data'),
+    uploadsDir: path.join(resetTmp, 'uploads'),
+  });
+  const srv = app.listen(0);
+  await new Promise((r) => srv.once('listening', r));
+  const resetBase = 'http://127.0.0.1:' + srv.address().port;
+  const post = (pathname, body) =>
+    fetch(resetBase + pathname, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+  try {
+    await post('/api/rsvp', { name: 'Convidado 1' });
+    await post('/api/rsvp', { name: 'Convidado 2' });
+    await post('/api/messages', { name: 'Convidado 3', text: 'Parabéns!' });
+
+    assert.equal((await fetch(resetBase + '/api/rsvp', { method: 'DELETE' })).status, 200);
+    assert.equal((await fetch(resetBase + '/api/messages', { method: 'DELETE' })).status, 200);
+
+    assert.equal((await (await fetch(resetBase + '/api/rsvp')).json()).length, 0);
+    assert.equal((await (await fetch(resetBase + '/api/messages')).json()).length, 0);
+  } finally {
+    srv.close();
+    fs.rmSync(resetTmp, { recursive: true, force: true });
+  }
+});
+
 // ---------- upload ----------
 test('POST /api/upload aceita imagem e devolve URL', async () => {
   const fd = new FormData();

@@ -68,6 +68,10 @@ function createListStore(client, table) {
       const { error } = await client.from(table).delete().eq('id', id);
       if (error) fail(`excluir de ${table}`, error);
     },
+    async clear() {
+      const { error } = await client.from(table).delete().neq('id', '');
+      if (error) fail(`limpar ${table}`, error);
+    },
   };
 }
 
