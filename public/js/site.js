@@ -280,9 +280,17 @@
   }
 
   // ---------- animação ao rolar ----------
+  // threshold por fração quebra em seções muito altas (uma lista com dezenas
+  // de presentes nunca tem 12% visível de uma vez e ficaria invisível);
+  // revela assim que a seção entra 80px na tela
   const io = new IntersectionObserver(
-    (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
-    { threshold: 0.12 }
+    (entries) => entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    }),
+    { threshold: 0, rootMargin: '0px 0px -80px 0px' }
   );
   document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
