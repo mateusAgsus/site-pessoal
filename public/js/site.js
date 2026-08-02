@@ -63,9 +63,15 @@
 
   const navbar = document.getElementById('navbar');
   const navToggle = document.getElementById('navToggle');
-  navToggle.addEventListener('click', () => navbar.classList.toggle('menu-open'));
+  navToggle.addEventListener('click', () => {
+    const open = navbar.classList.toggle('menu-open');
+    document.body.classList.toggle('nav-open', open);
+  });
   navLinks.addEventListener('click', (e) => {
-    if (e.target.tagName === 'A') navbar.classList.remove('menu-open');
+    if (e.target.tagName === 'A') {
+      navbar.classList.remove('menu-open');
+      document.body.classList.remove('nav-open');
+    }
   });
   const toTop = document.getElementById('toTop');
   window.addEventListener('scroll', () => {

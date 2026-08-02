@@ -646,6 +646,9 @@ a { color: var(--accent-dark); }
     transition: transform 0.35s ease;
   }
   .navbar.menu-open .nav-links { transform: none; }
+  /* backdrop-filter na navbar cria containing block e quebra o overlay fixed do menu */
+  .navbar.menu-open.scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  body.nav-open { overflow: hidden; }
   .nav-links a { color: var(--ink) !important; font-size: 1rem; }
   .hero { padding-top: 5.2rem; }
   .hero-grid { grid-template-columns: 1fr; gap: 1.6rem; justify-items: center; text-align: center; }
