@@ -454,6 +454,8 @@ th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; colo
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; width: 260px; }
   .sidebar.open { transform: none; box-shadow: 0 0 60px rgba(0,0,0,0.4); }
+  /* o botao fixo "Menu" ocupa o canto superior esquerdo; afasta o titulo para nao ficar por baixo dele */
+  .side-logo { padding-top: 4rem; }
   .mobile-menu-btn { display: block; }
   .content { margin-left: 0; padding-top: 4.2rem; }
   .savebar { left: 0; }

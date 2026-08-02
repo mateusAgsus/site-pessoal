@@ -185,9 +185,14 @@
     btn.classList.add('active');
     currentTab = btn.dataset.tab;
     sidebar.classList.remove('open');
+    mobileMenuBtn.textContent = '☰ Menu';
     render();
   });
-  document.getElementById('mobileMenuBtn').addEventListener('click', () => sidebar.classList.toggle('open'));
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  mobileMenuBtn.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('open');
+    mobileMenuBtn.textContent = open ? '✕ Fechar' : '☰ Menu';
+  });
 
   function render() {
     content.innerHTML = '';
